@@ -1,4 +1,7 @@
-package repository
+package repository //Repository — «как хранить и доставать»
+// За что отвечает
+// 		ЧТО можно сделать с хранилищем
+// 		НЕ КАК именно
 
 // Handler не должен знать,
 // Service не должен знать,
@@ -21,6 +24,5 @@ type UserRepository interface { // Мы объявляем контракт, а 
 	// Потому что:
 	// 		сервису часто нужен объект целиком
 	// 		это гибче
-	UpdateUser(user domain.User) error
 	DeleteUser(id uint) error
 }
