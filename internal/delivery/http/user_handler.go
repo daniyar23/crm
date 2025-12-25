@@ -44,7 +44,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.Create(domain.User{
+	user, err := h.userService.Create(&domain.User{
 		Name:  input.Name,
 		Email: input.Email,
 	})

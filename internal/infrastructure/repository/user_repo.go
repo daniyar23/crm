@@ -11,11 +11,11 @@ import (
 )
 
 type UserRepository interface { // Мы объявляем контракт, а не реализацию
-	GetUserByID(id uint) (domain.User, error)
+	GetUserByID(id uint) (*domain.User, error)
 	// Очевидно и просто — одна ответственность.
 	GetAllUsers() ([]domain.User, error)
 	// Для начала CRM этого достаточно.
-	CreateUser(user domain.User) (domain.User, error)
+	CreateUser(user *domain.User) (domain.User, error)
 	// принимает чистую domain-модель
 	// возвращает:
 	// 		пользователя (уже с ID)

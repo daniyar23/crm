@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/daniyar23/crm/internal/domain"
-	"github.com/daniyar23/crm/internal/repository"
+	"github.com/daniyar23/crm/internal/infrastructure/repository"
 )
 
 type CompanyService struct {
@@ -15,7 +15,7 @@ func NewCompanyService(repo repository.CompanyRepository) *CompanyService {
 	return &CompanyService{repo: repo}
 }
 
-func (s *CompanyService) Create(company domain.Company) (uint, error) {
+func (s *CompanyService) Create(company *domain.Company) (uint, error) {
 	if company.Name == "" {
 		return 0, errors.New("company name cannot be empty")
 	}
@@ -25,9 +25,9 @@ func (s *CompanyService) Create(company domain.Company) (uint, error) {
 	return s.repo.CreateCompany(company)
 }
 
-func (s *CompanyService) GetByID(id uint) (domain.Company, error) {
+func (s *CompanyService) GetByID(id uint) (*domain.Company, error) {
 	if id == 0 {
-		return domain.Company{}, errors.New("invalid company id")
+		return nil, errors.New("invalid company id")
 	}
 	return s.repo.GetCompanyByID(id)
 }

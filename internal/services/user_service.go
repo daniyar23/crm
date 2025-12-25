@@ -8,7 +8,7 @@ import (
 	"errors"
 
 	"github.com/daniyar23/crm/internal/domain"
-	"github.com/daniyar23/crm/internal/repository"
+	"github.com/daniyar23/crm/internal/infrastructure/repository"
 )
 
 type UserService struct {
@@ -19,7 +19,7 @@ func NewUserService(repo repository.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) Create(user domain.User) (domain.User, error) {
+func (s *UserService) Create(user *domain.User) (domain.User, error) {
 	if user.Email == "" {
 		return domain.User{}, errors.New("email is required")
 	}
@@ -30,9 +30,9 @@ func (s *UserService) Create(user domain.User) (domain.User, error) {
 	return s.repo.CreateUser(user)
 }
 
-func (s *UserService) GetByID(id uint) (domain.User, error) {
+func (s *UserService) GetByID(id uint) (*domain.User, error) {
 	if id == 0 {
-		return domain.User{}, errors.New("invalid user id")
+		return nil, errors.New("invalid user id")
 	}
 
 	return s.repo.GetUserByID(id)
