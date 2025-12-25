@@ -3,6 +3,7 @@ package services
 // Service может работать без HTTP.
 // Service может работать без PostgreSQL.
 // Но Service НЕ может работать без Domain и Repository
+
 import (
 	"errors"
 

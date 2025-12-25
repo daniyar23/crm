@@ -1,20 +1,22 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/daniyar23/crm/internal/handlers"
+	"github.com/daniyar23/crm/internal/repository"
+	"github.com/daniyar23/crm/internal/services"
 )
 
 func main() {
 	r := gin.Default()
 
-	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, World!")
-	})
+	userRepo := repository.NewUserMemoryRepository()
+	userService := services.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
 
-	if err := r.Run(":8080"); err != nil {
-		log.Fatal(err)
-	}
+	api := r.Group("/api")
+	userHandler.RegisterRoutes(api)
+
+	r.Run(":8080")
 }
