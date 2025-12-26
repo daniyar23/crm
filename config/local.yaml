@@ -1,6 +1,0 @@
-env: 'local'
-storage_path: '/var/lib/postgresql/data'
-http_server:
-  adsres: 'localhost:8080'
-  timeout: 4 # время на чтение и оправку ответа
-  idle_timeout: 60 # время жизни соединения
