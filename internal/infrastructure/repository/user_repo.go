@@ -7,22 +7,14 @@ package repository //Repository — «как хранить и достават�
 // Service не должен знать,
 // ГДЕ и КАК хранятся пользователи.
 import (
+	"context"
+
 	"github.com/daniyar23/crm/internal/domain"
 )
 
-type UserRepository interface { // Мы объявляем контракт, а не реализацию
-	GetUserByID(id uint) (*domain.User, error)
-	// Очевидно и просто — одна ответственность.
-	GetAllUsers() ([]domain.User, error)
-	// Для начала CRM этого достаточно.
-	CreateUser(user *domain.User) (domain.User, error)
-	// принимает чистую domain-модель
-	// возвращает:
-	// 		пользователя (уже с ID)
-	// 		ошибку (если БД упала, конфликт и т.п.)
-	// Почему возвращаем User, а не ID?
-	// Потому что:
-	// 		сервису часто нужен объект целиком
-	// 		это гибче
-	DeleteUser(id uint) error
+type UserRepository interface {
+	GetUserByID(ctx context.Context, id uint) (*domain.User, error)
+	GetAllUsers(ctx context.Context) ([]domain.User, error)
+	CreateUser(ctx context.Context, user *domain.User) (*domain.User, error)
+	DeleteUser(ctx context.Context, id uint) error
 }

@@ -1,4 +1,4 @@
-package handlers
+package delivery
 
 import (
 	"net/http"
@@ -28,12 +28,13 @@ func NewUserHandler(service *services.UserService) *UserHandler {
 
 func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup) {
 	users := r.Group("/users")
-	users.POST("", h.Create)
-	users.GET("", h.GetAll)
-	users.GET("/:id", h.GetByID)
+	users.POST("", h.CreateUser)
+	users.GET("", h.GetAllUsers)
+	users.GET("/:id", h.GetUserByID)
+	users.DELETE("/:id", h.DeleteUser)
 }
 
-func (h *UserHandler) Create(c *gin.Context) {
+func (h *UserHandler) CreateUser(c *gin.Context) {
 	var input struct {
 		Name  string `json:"name"`
 		Email string `json:"email"`
@@ -44,7 +45,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.Create(&domain.User{
+	user, err := h.userService.CreateUser(c.Request.Context(), &domain.User{
 		Name:  input.Name,
 		Email: input.Email,
 	})
@@ -56,7 +57,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
-func (h *UserHandler) GetByID(c *gin.Context) {
+func (h *UserHandler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -64,7 +65,7 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.GetByID(uint(id))
+	user, err := h.userService.GetUserByID(c.Request.Context(), uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -73,12 +74,30 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *UserHandler) GetAll(c *gin.Context) {
-	users, err := h.userService.GetAll()
+func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	users, err := h.userService.GetAllUsers(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, users)
+}
+
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	// Вызываем сервис для удаления
+	err = h.userService.DeleteUser(c.Request.Context(), uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "user deleted successfully"})
 }

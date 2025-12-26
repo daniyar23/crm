@@ -5,6 +5,7 @@ package services
 // Но Service НЕ может работать без Domain и Repository
 
 import (
+	"context"
 	"errors"
 
 	"github.com/daniyar23/crm/internal/domain"
@@ -19,32 +20,32 @@ func NewUserService(repo repository.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) Create(user *domain.User) (domain.User, error) {
+func (s *UserService) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	if user.Email == "" {
-		return domain.User{}, errors.New("email is required")
+		return nil, errors.New("email is required")
 	}
 	if user.Name == "" {
-		return domain.User{}, errors.New("name is required")
+		return nil, errors.New("name is required")
 	}
 
-	return s.repo.CreateUser(user)
+	return s.repo.CreateUser(ctx, user)
 }
 
-func (s *UserService) GetByID(id uint) (*domain.User, error) {
+func (s *UserService) GetUserByID(ctx context.Context, id uint) (*domain.User, error) {
 	if id == 0 {
 		return nil, errors.New("invalid user id")
 	}
 
-	return s.repo.GetUserByID(id)
+	return s.repo.GetUserByID(ctx, id)
 }
 
-func (s *UserService) GetAll() ([]domain.User, error) {
-	return s.repo.GetAllUsers()
+func (s *UserService) GetAllUsers(ctx context.Context) ([]domain.User, error) {
+	return s.repo.GetAllUsers(ctx)
 }
 
-func (s *UserService) Delete(id uint) error {
+func (s *UserService) DeleteUser(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid user id")
 	}
-	return s.repo.DeleteUser(id)
+	return s.repo.DeleteUser(ctx, id)
 }

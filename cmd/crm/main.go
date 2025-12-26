@@ -7,30 +7,32 @@ import (
 
 	"github.com/daniyar23/crm/internal/config"
 	delivery "github.com/daniyar23/crm/internal/delivery/http"
-
 	"github.com/daniyar23/crm/internal/infrastructure/db"
 	"github.com/daniyar23/crm/internal/services"
 )
 
 func main() {
-	r := gin.Default()
-
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	router := gin.Default()
+
 	dbConn, err := db.NewPostgres(cfg.DB.DSN())
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer dbConn.Close()
 
-	userRepo := db.NewUserPostgresRepository(db)
+	userRepo := db.NewUserPostgresRepository(dbConn)
 	userService := services.NewUserService(userRepo)
 	userHandler := delivery.NewUserHandler(userService)
 
-	api := r.Group("/api")
+	api := router.Group("/api")
 	userHandler.RegisterRoutes(api)
 
-	r.Run(":8080")
+	if err := router.Run(cfg.HTTPServer.Address); err != nil {
+		log.Fatal(err)
+	}
 }
