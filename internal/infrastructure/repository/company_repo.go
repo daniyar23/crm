@@ -1,10 +1,14 @@
 package repository
 
-import "github.com/daniyar23/crm/internal/domain"
+import (
+	"context"
+
+	"github.com/daniyar23/crm/internal/domain"
+)
 
 type CompanyRepository interface {
-	CreateCompany(company *domain.Company) (uint, error)
-	GetCompanyByID(id uint) (*domain.Company, error)
-	GetAllCompanies() ([]domain.Company, error)
-	DeleteCompany(id uint) error
+	CreateCompany(ctx context.Context, company *domain.Company) (uint, error)
+	GetCompanyByID(ctx context.Context, id uint) (*domain.Company, error)
+	GetAllCompanies(ctx context.Context) ([]domain.Company, error)
+	DeleteCompany(ctx context.Context, id uint) error
 }
