@@ -16,7 +16,7 @@
             }
 
             .container {
-                max-width: 700px;
+                max-width: 720px;
                 margin: 40px auto;
                 background: #ffffff;
                 padding: 32px;
@@ -26,12 +26,10 @@
 
             h1 {
                 text-align: center;
-                margin-bottom: 32px;
             }
 
             h2 {
                 margin-top: 32px;
-                margin-bottom: 12px;
             }
 
             input,
@@ -50,11 +48,18 @@
                 color: white;
                 border: none;
                 cursor: pointer;
-                margin-top: 12px;
             }
 
             button:hover {
                 background: #4338ca;
+            }
+
+            .danger {
+                background: #dc2626;
+            }
+
+            .danger:hover {
+                background: #b91c1c;
             }
 
             .card {
@@ -71,6 +76,9 @@
             }
 
             li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 padding: 8px 0;
                 border-bottom: 1px solid #e5e7eb;
             }
@@ -88,22 +96,22 @@
 
             <!-- USERS -->
             <h2>Создание пользователя</h2>
-
             <input id="userName" placeholder="Имя" />
             <input id="userEmail" placeholder="Email" />
             <button onclick="createUser()">Создать пользователя</button>
 
             <h2>Активный пользователь</h2>
-
             <select id="userSelect" onchange="onUserSelect()">
                 <option value="">— выберите пользователя —</option>
             </select>
+            <button class="danger" onclick="deleteActiveUser()">
+                Удалить пользователя
+            </button>
 
             <div class="card" id="activeUser">Не выбран</div>
 
             <!-- COMPANIES -->
             <h2>Компании пользователя</h2>
-
             <input id="companyName" placeholder="Название компании" />
             <button onclick="createCompany()">Создать компанию</button>
 
@@ -141,8 +149,8 @@
             }
 
             async function createUser() {
-                const name = document.getElementById("userName").value;
-                const email = document.getElementById("userEmail").value;
+                const name = userName.value;
+                const email = userEmail.value;
 
                 await fetch("/api/users", {
                     method: "POST",
@@ -150,32 +158,47 @@
                     body: JSON.stringify({ name, email }),
                 });
 
-                document.getElementById("userName").value = "";
-                document.getElementById("userEmail").value = "";
+                userName.value = "";
+                userEmail.value = "";
+                loadUsers();
+            }
+
+            async function deleteActiveUser() {
+                if (!activeUserId) {
+                    alert("Пользователь не выбран");
+                    return;
+                }
+
+                if (!confirm("Удалить пользователя и все его компании?"))
+                    return;
+
+                await fetch(`/api/users/${activeUserId}`, {
+                    method: "DELETE",
+                });
+
+                activeUserId = null;
+                document.getElementById("activeUser").innerText = "Не выбран";
 
                 loadUsers();
+                loadCompanies();
             }
 
             /* ACTIVE USER */
 
             function onUserSelect() {
-                const select = document.getElementById("userSelect");
-                const userId = Number(select.value);
+                const id = Number(userSelect.value);
 
-                if (!userId) {
+                if (!id) {
                     activeUserId = null;
-                    document.getElementById("activeUser").innerText =
-                        "Не выбран";
+                    activeUser.innerText = "Не выбран";
                     renderCompanies();
                     return;
                 }
 
-                activeUserId = userId;
-                const user = users.find((u) => u.id === userId);
+                activeUserId = id;
+                const user = users.find((u) => u.id === id);
 
-                document.getElementById("activeUser").innerText =
-                    `${user.name}\n${user.email}\nID: ${user.id}`;
-
+                activeUser.innerText = `${user.name}\n${user.email}\nID: ${user.id}`;
                 renderCompanies();
             }
 
@@ -208,7 +231,10 @@
 
                 filtered.forEach((c) => {
                     const li = document.createElement("li");
-                    li.textContent = c.name;
+                    li.innerHTML = `
+                <span>${c.name}</span>
+                <button class="danger" onclick="deleteCompany(${c.id})">✕</button>
+            `;
                     ul.appendChild(li);
                 });
             }
@@ -219,24 +245,30 @@
                     return;
                 }
 
-                const name = document.getElementById("companyName").value;
-
                 await fetch("/api/companies", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        name: name,
+                        name: companyName.value,
                         user_id: activeUserId,
                     }),
                 });
 
-                document.getElementById("companyName").value = "";
+                companyName.value = "";
+                loadCompanies();
+            }
+
+            async function deleteCompany(id) {
+                if (!confirm("Удалить компанию?")) return;
+
+                await fetch(`/api/companies/${id}`, {
+                    method: "DELETE",
+                });
 
                 loadCompanies();
             }
 
             /* INIT */
-
             loadUsers();
             loadCompanies();
         </script>
