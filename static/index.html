@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>CRM Lite</title>
+
+        <style>
+            body {
+                margin: 0;
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    sans-serif;
+                background: #f4f6f8;
+            }
+
+            .container {
+                max-width: 700px;
+                margin: 40px auto;
+                background: #ffffff;
+                padding: 32px;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            }
+
+            h1 {
+                text-align: center;
+                margin-bottom: 32px;
+            }
+
+            h2 {
+                margin-top: 32px;
+                margin-bottom: 12px;
+            }
+
+            input,
+            select,
+            button {
+                width: 100%;
+                padding: 10px 12px;
+                margin-top: 8px;
+                font-size: 14px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+            }
+
+            button {
+                background: #4f46e5;
+                color: white;
+                border: none;
+                cursor: pointer;
+                margin-top: 12px;
+            }
+
+            button:hover {
+                background: #4338ca;
+            }
+
+            .card {
+                background: #f9fafb;
+                padding: 16px;
+                border-radius: 8px;
+                margin-top: 12px;
+            }
+
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            li {
+                padding: 8px 0;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .muted {
+                color: #6b7280;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>CRM Lite</h1>
+
+            <!-- USERS -->
+            <h2>Создание пользователя</h2>
+
+            <input id="userName" placeholder="Имя" />
+            <input id="userEmail" placeholder="Email" />
+            <button onclick="createUser()">Создать пользователя</button>
+
+            <h2>Активный пользователь</h2>
+
+            <select id="userSelect" onchange="onUserSelect()">
+                <option value="">— выберите пользователя —</option>
+            </select>
+
+            <div class="card" id="activeUser">Не выбран</div>
+
+            <!-- COMPANIES -->
+            <h2>Компании пользователя</h2>
+
+            <input id="companyName" placeholder="Название компании" />
+            <button onclick="createCompany()">Создать компанию</button>
+
+            <div class="card">
+                <ul id="companies">
+                    <li class="muted">Пользователь не выбран</li>
+                </ul>
+            </div>
+        </div>
+
+        <script>
+            let users = [];
+            let companies = [];
+            let activeUserId = null;
+
+            /* USERS */
+
+            async function loadUsers() {
+                const res = await fetch("/api/users");
+                users = await res.json();
+                renderUserSelect();
+            }
+
+            function renderUserSelect() {
+                const select = document.getElementById("userSelect");
+                select.innerHTML =
+                    '<option value="">— выберите пользователя —</option>';
+
+                users.forEach((u) => {
+                    const option = document.createElement("option");
+                    option.value = u.id;
+                    option.textContent = `${u.name} (${u.email})`;
+                    select.appendChild(option);
+                });
+            }
+
+            async function createUser() {
+                const name = document.getElementById("userName").value;
+                const email = document.getElementById("userEmail").value;
+
+                await fetch("/api/users", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email }),
+                });
+
+                document.getElementById("userName").value = "";
+                document.getElementById("userEmail").value = "";
+
+                loadUsers();
+            }
+
+            /* ACTIVE USER */
+
+            function onUserSelect() {
+                const select = document.getElementById("userSelect");
+                const userId = Number(select.value);
+
+                if (!userId) {
+                    activeUserId = null;
+                    document.getElementById("activeUser").innerText =
+                        "Не выбран";
+                    renderCompanies();
+                    return;
+                }
+
+                activeUserId = userId;
+                const user = users.find((u) => u.id === userId);
+
+                document.getElementById("activeUser").innerText =
+                    `${user.name}\n${user.email}\nID: ${user.id}`;
+
+                renderCompanies();
+            }
+
+            /* COMPANIES */
+
+            async function loadCompanies() {
+                const res = await fetch("/api/companies");
+                companies = await res.json();
+                renderCompanies();
+            }
+
+            function renderCompanies() {
+                const ul = document.getElementById("companies");
+                ul.innerHTML = "";
+
+                if (!activeUserId) {
+                    ul.innerHTML =
+                        '<li class="muted">Пользователь не выбран</li>';
+                    return;
+                }
+
+                const filtered = companies.filter(
+                    (c) => c.user_id === activeUserId,
+                );
+
+                if (filtered.length === 0) {
+                    ul.innerHTML = '<li class="muted">Компаний нет</li>';
+                    return;
+                }
+
+                filtered.forEach((c) => {
+                    const li = document.createElement("li");
+                    li.textContent = c.name;
+                    ul.appendChild(li);
+                });
+            }
+
+            async function createCompany() {
+                if (!activeUserId) {
+                    alert("Выберите пользователя");
+                    return;
+                }
+
+                const name = document.getElementById("companyName").value;
+
+                await fetch("/api/companies", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: name,
+                        user_id: activeUserId,
+                    }),
+                });
+
+                document.getElementById("companyName").value = "";
+
+                loadCompanies();
+            }
+
+            /* INIT */
+
+            loadUsers();
+            loadCompanies();
+        </script>
+    </body>
+</html>
