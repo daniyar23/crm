@@ -1,7 +1,7 @@
 package domain
 
 type Company struct {
-	ID      uint
-	Name    string
-	User_ID int
+	ID     uint   `json:"id"`
+	Name   string `json:"name"`
+	UserID int    `json:"user_id"`
 }
