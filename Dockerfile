@@ -2,9 +2,12 @@ FROM golang:1.24-bookworm
 
 WORKDIR /app
 
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN go mod tidy
+EXPOSE 8080
 
-CMD ["make","up"]
-CMD ["make","run"]
+CMD ["go", "run", "./cmd/crm/main.go"]
+
