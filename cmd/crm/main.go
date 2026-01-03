@@ -24,6 +24,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer dbConn.Close()
+	// test
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	delivery.InitRoutes(router)
 
 	// User
 	userRepo := db.NewUserPostgresRepository(dbConn)
