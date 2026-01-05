@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/daniyar23/crm/internal/domain"
+	"github.com/daniyar23/crm/internal/core/domain"
 )
 
 type CompanyRepository interface {

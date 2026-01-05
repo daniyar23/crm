@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/daniyar23/crm/internal/domain"
-	"github.com/daniyar23/crm/internal/services"
+	"github.com/daniyar23/crm/internal/core/domain"
+	"github.com/daniyar23/crm/internal/feature/feature1/services"
 )
 
 // UserHandler — это структура, которая

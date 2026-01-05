@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/daniyar23/crm/internal/domain"
+	"github.com/daniyar23/crm/internal/core/domain"
 )
 
 type UserPostgresRepository struct {

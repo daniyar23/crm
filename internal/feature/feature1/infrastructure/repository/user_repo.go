@@ -9,7 +9,7 @@ package repository //Repository — «как хранить и достават�
 import (
 	"context"
 
-	"github.com/daniyar23/crm/internal/domain"
+	"github.com/daniyar23/crm/internal/core/domain"
 )
 
 type UserRepository interface {

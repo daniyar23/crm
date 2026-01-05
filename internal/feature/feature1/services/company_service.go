@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/daniyar23/crm/internal/domain"
-	"github.com/daniyar23/crm/internal/infrastructure/repository"
+	"github.com/daniyar23/crm/internal/core/domain"
+	"github.com/daniyar23/crm/internal/feature/feature1/infrastructure/repository"
 )
 
 type CompanyService struct {
