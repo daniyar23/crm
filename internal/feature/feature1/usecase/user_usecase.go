@@ -20,12 +20,14 @@ type UserService interface {
 // Отвечает за сценарии, а не за реализацию.
 type UserUseCase struct {
 	userService UserService
+	eventBus    EventBus
 }
 
 // Конструктор
-func NewUserUseCase(userService UserService) *UserUseCase {
+func NewUserUseCase(userService UserService, eventBus EventBus) *UserUseCase {
 	return &UserUseCase{
 		userService: userService,
+		eventBus:    eventBus,
 	}
 }
 

@@ -43,3 +43,13 @@ func (s *CompanyService) DeleteCompany(ctx context.Context, id uint) error {
 	}
 	return s.repo.DeleteCompany(ctx, id)
 }
+func (s *CompanyService) DeleteCompaniesByUser(
+	ctx context.Context,
+	userID uint,
+) error {
+	if userID == 0 {
+		return errors.New("invalid user id")
+	}
+
+	return s.repo.DeleteCompaniesByUser(ctx, userID)
+}
