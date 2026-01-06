@@ -7,7 +7,7 @@ import (
 )
 
 type CompanyRepository interface {
-	CreateCompany(ctx context.Context, company *domain.Company) (uint, error)
+	CreateCompany(ctx context.Context, company *domain.Company) (*domain.Company, error)
 	GetCompanyByID(ctx context.Context, id uint) (*domain.Company, error)
 	GetAllCompanies(ctx context.Context) ([]domain.Company, error)
 	DeleteCompany(ctx context.Context, id uint) error

@@ -18,7 +18,7 @@ func NewCompanyPostgresRepository(db *sql.DB) *CompanyPostgresRepository {
 func (r *CompanyPostgresRepository) CreateCompany(
 	ctx context.Context,
 	company *domain.Company,
-) (uint, error) {
+) (*domain.Company, error) {
 
 	query := `
 		INSERT INTO companies (name, user_id)
@@ -35,10 +35,14 @@ func (r *CompanyPostgresRepository) CreateCompany(
 	).Scan(&id)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return id, nil
+	return &domain.Company{
+		ID:     id,
+		Name:   company.Name,
+		UserID: company.UserID,
+	}, nil
 }
 func (r *CompanyPostgresRepository) GetCompanyByID(
 	ctx context.Context,

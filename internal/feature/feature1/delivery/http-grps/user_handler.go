@@ -7,23 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/daniyar23/crm/internal/core/domain"
-	"github.com/daniyar23/crm/internal/feature/feature1/services"
+	"github.com/daniyar23/crm/internal/feature/feature1/usecase"
 )
 
-// UserHandler — это структура, которая
-// 1. принимает HTTP-запросы
-// 2. вызывает UserService
-// 3. возвращает HTTP-ответ
 type UserHandler struct {
-	userService *services.UserService
+	userUC *usecase.UserUseCase
 }
 
-// ВАЖНО
-// handler зависит от service
-// handler НЕ работает напрямую с БД
-// UserService передаётся извне (dependency injection)
-func NewUserHandler(service *services.UserService) *UserHandler {
-	return &UserHandler{userService: service}
+func NewUserHandler(userUC *usecase.UserUseCase) *UserHandler {
+	return &UserHandler{userUC: userUC}
 }
 
 func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup) {
@@ -45,10 +37,13 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.CreateUser(c.Request.Context(), &domain.User{
-		Name:  input.Name,
-		Email: input.Email,
-	})
+	user, err := h.userUC.CreateUser(
+		c.Request.Context(),
+		&domain.User{
+			Name:  input.Name,
+			Email: input.Email,
+		},
+	)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -58,14 +53,13 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
 
-	user, err := h.userService.GetUserByID(c.Request.Context(), uint(id))
+	user, err := h.userUC.GetUserByID(c.Request.Context(), uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -75,7 +69,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 }
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
-	users, err := h.userService.GetAllUsers(c.Request.Context())
+	users, err := h.userUC.GetAllUsers(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -85,19 +79,16 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
 		return
 	}
 
-	// Вызываем сервис для удаления
-	err = h.userService.DeleteUser(c.Request.Context(), uint(id))
-	if err != nil {
+	if err := h.userUC.DeleteUser(c.Request.Context(), uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "user deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "user deleted"})
 }

@@ -16,12 +16,12 @@ func NewCompanyService(repo repository.CompanyRepository) *CompanyService {
 	return &CompanyService{repo: repo}
 }
 
-func (s *CompanyService) CreateCompany(ctx context.Context, company *domain.Company) (uint, error) {
+func (s *CompanyService) CreateCompany(ctx context.Context, company *domain.Company) (*domain.Company, error) {
 	if company.Name == "" {
-		return 0, errors.New("company name cannot be empty")
+		return nil, errors.New("company name cannot be empty")
 	}
 	if company.UserID == 0 {
-		return 0, errors.New("user id cannot be empty")
+		return nil, errors.New("user id cannot be empty")
 	}
 	return s.repo.CreateCompany(ctx, company)
 }
