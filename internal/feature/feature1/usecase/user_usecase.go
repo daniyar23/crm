@@ -10,21 +10,21 @@ import (
 // UserService — интерфейс бизнес-логики.
 // Реализация будет в service-слое.
 type UserService interface {
-	Create(ctx context.Context, user *domain.User) error
-	GetByID(ctx context.Context, id uint) (*domain.User, error)
-	GetAllUsers(ctx context.Context) ([]*domain.User, error)
-	Delete(ctx context.Context, id uint) error
+	GetUserByID(ctx context.Context, id uint) (*domain.User, error)
+	GetAllUsers(ctx context.Context) ([]domain.User, error)
+	CreateUser(ctx context.Context, user *domain.User) (*domain.User, error)
+	DeleteUser(ctx context.Context, id uint) error
 }
 
 // UserUseCase — слой usecase (application layer).
 // Отвечает за сценарии, а не за реализацию.
 type UserUseCase struct {
 	userService UserService
-	eventBus    EventBus
+	eventBus    *EventBus
 }
 
 // Конструктор
-func NewUserUseCase(userService UserService, eventBus EventBus) *UserUseCase {
+func NewUserUseCase(userService UserService, eventBus *EventBus) *UserUseCase {
 	return &UserUseCase{
 		userService: userService,
 		eventBus:    eventBus,
@@ -41,7 +41,7 @@ func (u *UserUseCase) CreateUser(
 		return nil, errors.New("email and name are required")
 	}
 
-	if err := u.userService.Create(ctx, user); err != nil {
+	if _, err := u.userService.CreateUser(ctx, user); err != nil {
 		return nil, err
 	}
 
@@ -58,13 +58,13 @@ func (u *UserUseCase) GetUserByID(
 		return nil, errors.New("invalid user id")
 	}
 
-	return u.userService.GetByID(ctx, id)
+	return u.userService.GetUserByID(ctx, id)
 }
 
 // GetAllUsers — сценарий получения списка пользователей
 func (u *UserUseCase) GetAllUsers(
 	ctx context.Context,
-) ([]*domain.User, error) {
+) ([]domain.User, error) {
 
 	return u.userService.GetAllUsers(ctx)
 }
@@ -79,5 +79,5 @@ func (u *UserUseCase) DeleteUser(
 		return errors.New("invalid user id")
 	}
 
-	return u.userService.Delete(ctx, id)
+	return u.userService.DeleteUser(ctx, id)
 }

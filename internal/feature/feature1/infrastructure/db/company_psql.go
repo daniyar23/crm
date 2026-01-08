@@ -127,3 +127,62 @@ func (r *CompanyPostgresRepository) DeleteCompany(
 
 	return nil
 }
+func (r *CompanyPostgresRepository) GetCompaniesByUser(
+	ctx context.Context,
+	userID uint,
+) ([]domain.Company, error) {
+
+	query := `
+		SELECT id, name, user_id
+		FROM companies
+		WHERE user_id = $1
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var companies []domain.Company
+
+	for rows.Next() {
+		var c domain.Company
+		if err := rows.Scan(&c.ID, &c.Name, &c.UserID); err != nil {
+			return nil, err
+		}
+		companies = append(companies, c)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return companies, nil
+}
+func (r *CompanyPostgresRepository) DeleteCompaniesByUser(
+	ctx context.Context,
+	userID uint,
+) error {
+
+	query := `
+		DELETE FROM companies
+		WHERE user_id = $1
+	`
+
+	result, err := r.db.ExecContext(ctx, query, userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}

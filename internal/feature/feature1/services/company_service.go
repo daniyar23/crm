@@ -26,23 +26,22 @@ func (s *CompanyService) CreateCompany(ctx context.Context, company *domain.Comp
 	return s.repo.CreateCompany(ctx, company)
 }
 
-func (s *CompanyService) GetCompanyByID(ctx context.Context, id uint) (*domain.Company, error) {
-	if id == 0 {
-		return nil, errors.New("invalid company id")
-	}
-	return s.repo.GetCompanyByID(ctx, id)
-}
-
-func (s *CompanyService) GetAllCompanies(ctx context.Context) ([]domain.Company, error) {
-	return s.repo.GetAllCompanies(ctx)
-}
-
 func (s *CompanyService) DeleteCompany(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid company id")
 	}
 	return s.repo.DeleteCompany(ctx, id)
 }
+func (s *CompanyService) GetCompaniesByUser(
+	ctx context.Context,
+	userID uint,
+) ([]domain.Company, error) {
+	if userID == 0 {
+		return nil, errors.New("invalid user id")
+	}
+	return s.repo.GetCompaniesByUser(ctx, userID)
+}
+
 func (s *CompanyService) DeleteCompaniesByUser(
 	ctx context.Context,
 	userID uint,
@@ -50,6 +49,5 @@ func (s *CompanyService) DeleteCompaniesByUser(
 	if userID == 0 {
 		return errors.New("invalid user id")
 	}
-
 	return s.repo.DeleteCompaniesByUser(ctx, userID)
 }
