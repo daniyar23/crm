@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/daniyar23/crm/internal/core/domain"
+	"github.com/daniyar23/crm/internal/feature/feature1/delivery/dto"
 	"github.com/daniyar23/crm/internal/feature/feature1/usecase"
 )
 
@@ -27,21 +28,17 @@ func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup) {
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var input struct {
-		Name  string `json:"name"`
-		Email string `json:"email"`
-	}
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+	var req dto.CreateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
 	user, err := h.userUC.CreateUser(
 		c.Request.Context(),
 		&domain.User{
-			Name:  input.Name,
-			Email: input.Email,
+			Name:  req.Name,
+			Email: req.Email,
 		},
 	)
 	if err != nil {
@@ -49,13 +46,19 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, user)
+	resp := dto.UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	c.JSON(http.StatusCreated, resp)
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
 		return
 	}
 
@@ -65,7 +68,13 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	resp := dto.UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
@@ -75,7 +84,16 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	resp := make([]dto.UserResponse, 0, len(users))
+	for _, u := range users {
+		resp = append(resp, dto.UserResponse{
+			ID:    u.ID,
+			Name:  u.Name,
+			Email: u.Email,
+		})
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {

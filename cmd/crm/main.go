@@ -9,6 +9,7 @@ import (
 	"github.com/daniyar23/crm/internal/core/config"
 	delivery "github.com/daniyar23/crm/internal/feature/feature1/delivery/http-grps"
 	"github.com/daniyar23/crm/internal/feature/feature1/infrastructure/db"
+	"github.com/daniyar23/crm/internal/feature/feature1/infrastructure/eventbus"
 	"github.com/daniyar23/crm/internal/feature/feature1/services"
 	"github.com/daniyar23/crm/internal/feature/feature1/usecase"
 )
@@ -39,7 +40,7 @@ func main() {
 	companyService := services.NewCompanyService(companyRepo)
 
 	// ---------- event bus ----------
-	eventBus := usecase.NewEventBus(100)
+	eventBus := eventbus.New(100)
 
 	// ---------- usecases ----------
 	userUC := usecase.NewUserUseCase(userService, eventBus)

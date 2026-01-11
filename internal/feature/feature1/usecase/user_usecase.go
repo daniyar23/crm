@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/daniyar23/crm/internal/core/domain"
+	"github.com/daniyar23/crm/internal/feature/feature1/usecase/events"
 )
 
 // UserService — интерфейс бизнес-логики.
@@ -20,11 +21,11 @@ type UserService interface {
 // Отвечает за сценарии, а не за реализацию.
 type UserUseCase struct {
 	userService UserService
-	eventBus    *EventBus
+	eventBus    EventBus
 }
 
 // Конструктор
-func NewUserUseCase(userService UserService, eventBus *EventBus) *UserUseCase {
+func NewUserUseCase(userService UserService, eventBus EventBus) *UserUseCase {
 	return &UserUseCase{
 		userService: userService,
 		eventBus:    eventBus,
@@ -79,5 +80,13 @@ func (u *UserUseCase) DeleteUser(
 		return errors.New("invalid user id")
 	}
 
-	return u.userService.DeleteUser(ctx, id)
+	if err := u.userService.DeleteUser(ctx, id); err != nil {
+		return err
+	}
+
+	u.eventBus.Publish(events.UserDeleted{
+		UserID: id,
+	})
+
+	return nil
 }

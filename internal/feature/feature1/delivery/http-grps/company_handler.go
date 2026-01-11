@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/daniyar23/crm/internal/core/domain"
+	"github.com/daniyar23/crm/internal/feature/feature1/delivery/dto"
 	"github.com/daniyar23/crm/internal/feature/feature1/usecase"
 )
 
@@ -26,21 +27,17 @@ func (h *CompanyHandler) RegisterRoutes(r *gin.RouterGroup) {
 }
 
 func (h *CompanyHandler) CreateCompany(c *gin.Context) {
-	var input struct {
-		Name   string `json:"name"`
-		UserID uint   `json:"user_id"`
-	}
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+	var req dto.CreateCompanyRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
 	company, err := h.companyUC.CreateCompany(
 		c.Request.Context(),
 		&domain.Company{
-			Name:   input.Name,
-			UserID: int(input.UserID),
+			Name:   req.Name,
+			UserID: req.UserID,
 		},
 	)
 	if err != nil {
@@ -48,7 +45,13 @@ func (h *CompanyHandler) CreateCompany(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, company)
+	resp := dto.CompanyResponse{
+		ID:     company.ID,
+		Name:   company.Name,
+		UserID: company.UserID,
+	}
+
+	c.JSON(http.StatusCreated, resp)
 }
 
 func (h *CompanyHandler) GetByUser(c *gin.Context) {
@@ -67,7 +70,16 @@ func (h *CompanyHandler) GetByUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, companies)
+	resp := make([]dto.CompanyResponse, 0, len(companies))
+	for _, cpy := range companies {
+		resp = append(resp, dto.CompanyResponse{
+			ID:     cpy.ID,
+			Name:   cpy.Name,
+			UserID: cpy.UserID,
+		})
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *CompanyHandler) DeleteCompany(c *gin.Context) {

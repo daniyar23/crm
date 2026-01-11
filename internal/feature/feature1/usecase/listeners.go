@@ -1,10 +1,18 @@
 package usecase
 
-import "context"
+import (
+	"context"
 
-func StartUserDeletedListener(
+	"your_project/internal/events"
+)
+
+type CompanyService interface {
+	DeleteCompaniesByUser(ctx context.Context, userID int) error
+}
+
+func RunListeners(
 	ctx context.Context,
-	events *EventBus,
+	eventBus events.EventBus,
 	companyService CompanyService,
 ) {
 	go func() {
@@ -12,10 +20,13 @@ func StartUserDeletedListener(
 			select {
 			case <-ctx.Done():
 				return
-			case e := <-events.Subscribe():
+
+			case e := <-eventBus.Subscribe():
 				switch ev := e.(type) {
-				case UserDeletedEvent:
+
+				case events.UserDeleted:
 					_ = companyService.DeleteCompaniesByUser(ctx, ev.UserID)
+
 				}
 			}
 		}
