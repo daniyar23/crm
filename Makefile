@@ -4,7 +4,7 @@ up:
 	docker-compose up -d
 
 run:
-	go run ./main.go
+	go run ./cmd/crm/main.go
 
 stop:
 	docker-compose stop

@@ -57,7 +57,7 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-
+	delivery.InitRoutes(router)
 	api := router.Group("/api")
 
 	// users
@@ -79,4 +79,5 @@ func main() {
 	if err := router.Run(cfg.HTTPServer.Address); err != nil {
 		log.Fatal(err)
 	}
+
 }
