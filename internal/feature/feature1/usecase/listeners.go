@@ -3,12 +3,8 @@ package usecase
 import (
 	"context"
 
-	"your_project/internal/events"
+	"github.com/daniyar23/crm/internal/feature/feature1/events"
 )
-
-type CompanyService interface {
-	DeleteCompaniesByUser(ctx context.Context, userID int) error
-}
 
 func RunListeners(
 	ctx context.Context,
@@ -25,7 +21,7 @@ func RunListeners(
 				switch ev := e.(type) {
 
 				case events.UserDeleted:
-					_ = companyService.DeleteCompaniesByUser(ctx, ev.UserID)
+					_ = companyService.DeleteCompaniesByUser(ctx, uint(ev.UserID))
 
 				}
 			}

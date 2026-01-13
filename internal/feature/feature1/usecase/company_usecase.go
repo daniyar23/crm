@@ -11,7 +11,7 @@ type CompanyService interface {
 	CreateCompany(context.Context, *domain.Company) (*domain.Company, error)
 	GetCompaniesByUser(context.Context, uint) ([]domain.Company, error)
 	DeleteCompany(context.Context, uint) error
-	DeleteCompaniesByUser(context.Context, uint) error
+	DeleteCompaniesByUser(ctx context.Context, userID uint) error
 }
 
 type CompanyUseCase struct {

@@ -8,8 +8,8 @@ import (
 
 	"github.com/daniyar23/crm/internal/core/config"
 	delivery "github.com/daniyar23/crm/internal/feature/feature1/delivery/http-grps"
+	"github.com/daniyar23/crm/internal/feature/feature1/events"
 	"github.com/daniyar23/crm/internal/feature/feature1/infrastructure/db"
-	"github.com/daniyar23/crm/internal/feature/feature1/infrastructure/eventbus"
 	"github.com/daniyar23/crm/internal/feature/feature1/services"
 	"github.com/daniyar23/crm/internal/feature/feature1/usecase"
 )
@@ -40,14 +40,14 @@ func main() {
 	companyService := services.NewCompanyService(companyRepo)
 
 	// ---------- event bus ----------
-	eventBus := eventbus.New(100)
+	eventBus := events.NewInMemoryBus()
 
 	// ---------- usecases ----------
 	userUC := usecase.NewUserUseCase(userService, eventBus)
 	companyUC := usecase.NewCompanyUseCase(companyService)
 
 	// ---------- async listeners ----------
-	usecase.StartUserDeletedListener(
+	usecase.RunListeners(
 		ctx,
 		eventBus,
 		companyService, // service ОК — это background business flow
