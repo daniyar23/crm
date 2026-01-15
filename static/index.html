@@ -2,18 +2,17 @@
 <html lang="ru">
     <head>
         <meta charset="UTF-8" />
-        <title>CRM Lite — Danik.dev</title>
+        <title>CRM Lite</title>
 
         <style>
             :root {
-                --bg: #0f172a;
-                --card: rgba(255, 255, 255, 0.08);
-                --border: rgba(255, 255, 255, 0.14);
+                --bg: #0b1020;
+                --glass: rgba(255, 255, 255, 0.08);
+                --border: rgba(255, 255, 255, 0.15);
                 --text: #e5e7eb;
                 --muted: #9ca3af;
                 --primary: #6366f1;
                 --danger: #ef4444;
-                --success: #22c55e;
             }
 
             * {
@@ -26,11 +25,10 @@
                 font-family:
                     system-ui,
                     -apple-system,
-                    BlinkMacSystemFont,
                     sans-serif;
                 background:
                     radial-gradient(
-                        1000px 500px at 10% -10%,
+                        900px 500px at 10% -10%,
                         #1e293b,
                         transparent
                     ),
@@ -44,20 +42,35 @@
             }
 
             .container {
-                max-width: 960px;
+                max-width: 1000px;
                 margin: 40px auto;
                 padding: 24px;
             }
 
             h1 {
                 text-align: center;
-                font-size: 34px;
-                margin-bottom: 32px;
+                font-size: 36px;
+                margin-bottom: 40px;
             }
 
-            h2 {
-                font-size: 18px;
-                margin-bottom: 12px;
+            .card {
+                background: var(--glass);
+                border: 1px solid var(--border);
+                backdrop-filter: blur(16px);
+                border-radius: 20px;
+                padding: 22px;
+                animation: fadeUp 0.4s ease;
+            }
+
+            @keyframes fadeUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
             }
 
             .grid {
@@ -66,28 +79,8 @@
                 gap: 24px;
             }
 
-            .card {
-                background: var(--card);
-                border: 1px solid var(--border);
-                backdrop-filter: blur(16px);
-                border-radius: 18px;
-                padding: 20px;
-                animation: fadeUp 0.35s ease;
-            }
-
-            @keyframes fadeUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
             .stack > * + * {
-                margin-top: 12px;
+                margin-top: 14px;
             }
 
             input,
@@ -95,8 +88,7 @@
             button {
                 width: 100%;
                 padding: 12px 14px;
-                border-radius: 12px;
-                font-size: 14px;
+                border-radius: 14px;
                 border: 1px solid var(--border);
                 background: rgba(255, 255, 255, 0.06);
                 color: var(--text);
@@ -116,54 +108,50 @@
                 transform: translateY(-1px);
                 opacity: 0.95;
             }
-            button:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
 
             button.danger {
                 background: linear-gradient(135deg, #ef4444, #dc2626);
             }
 
-            ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
+            .section-title {
+                font-size: 18px;
+                color: var(--muted);
+                margin-bottom: 12px;
             }
 
-            li {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-                border-bottom: 1px solid var(--border);
-                animation: fadeUp 0.25s ease;
+            /* ---- COMPANIES ---- */
+
+            .company-header {
+                font-size: 22px;
+                margin-bottom: 16px;
             }
 
-            li:last-child {
-                border-bottom: none;
+            .company-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 16px;
             }
 
-            .delete-btn {
+            .company-card {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 16px;
+                animation: fadeUp 0.3s ease;
+                position: relative;
+            }
+
+            .company-card button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
                 background: none;
-                border: none;
                 color: var(--danger);
                 font-size: 18px;
-                cursor: pointer;
             }
 
-            .muted {
-                color: var(--muted);
-            }
+            /* ---- TOAST ---- */
 
-            footer {
-                margin-top: 32px;
-                text-align: center;
-                font-size: 13px;
-                color: var(--muted);
-            }
-
-            /* ---------- TOASTS ---------- */
             #toasts {
                 position: fixed;
                 top: 24px;
@@ -171,16 +159,13 @@
                 display: flex;
                 flex-direction: column;
                 gap: 12px;
-                z-index: 1000;
             }
 
             .toast {
-                min-width: 260px;
-                padding: 14px 16px;
-                border-radius: 12px;
+                padding: 14px 18px;
+                border-radius: 14px;
                 backdrop-filter: blur(12px);
-                color: white;
-                animation: toastIn 0.3s ease forwards;
+                animation: slideIn 0.3s ease;
             }
 
             .toast.success {
@@ -190,14 +175,14 @@
                 background: rgba(239, 68, 68, 0.85);
             }
 
-            @keyframes toastIn {
+            @keyframes slideIn {
                 from {
                     opacity: 0;
                     transform: translateX(30px);
                 }
                 to {
                     opacity: 1;
-                    transform: translateX(0);
+                    transform: none;
                 }
             }
 
@@ -217,14 +202,14 @@
 
             <div class="grid">
                 <div class="card stack">
-                    <h2>Создать пользователя</h2>
+                    <div class="section-title">Создать пользователя</div>
                     <input id="userName" placeholder="Имя" />
                     <input id="userEmail" placeholder="Email" />
                     <button onclick="createUser()">Создать</button>
                 </div>
 
                 <div class="card stack">
-                    <h2>Активный пользователь</h2>
+                    <div class="section-title">Активный пользователь</div>
                     <select id="userSelect" onchange="onUserSelect()">
                         <option value="">— не выбран —</option>
                     </select>
@@ -235,25 +220,27 @@
                 </div>
             </div>
 
-            <div class="card stack" style="margin-top: 24px">
-                <h2>Компании</h2>
-                <input id="companyName" placeholder="Название компании" />
-                <button onclick="createCompany()">Добавить компанию</button>
-                <ul id="companies">
-                    <li class="muted">Пользователь не выбран</li>
-                </ul>
-            </div>
+            <div class="card stack" style="margin-top: 32px">
+                <div id="companyTitle" class="company-header muted">
+                    Выберите пользователя
+                </div>
 
-            <footer>made with ☕ by danik.dev</footer>
-            <footer>github.com/daniyar23</footer>
+                <div class="stack">
+                    <input id="companyName" placeholder="Название компании" />
+                    <button onclick="createCompany()">Добавить компанию</button>
+                </div>
+
+                <div id="companies" class="company-grid"></div>
+            </div>
         </div>
 
         <script>
-            let users = [],
-                companies = [],
-                activeUserId = null;
+            let users = [];
+            let companies = [];
+            let activeUser = null;
 
-            /* ---------- TOAST ---------- */
+            const companiesEl = document.getElementById("companies");
+
             function toast(msg, type = "success") {
                 const t = document.createElement("div");
                 t.className = `toast ${type}`;
@@ -262,7 +249,8 @@
                 setTimeout(() => t.remove(), 3000);
             }
 
-            /* ---------- USERS ---------- */
+            /* USERS */
+
             async function loadUsers() {
                 const r = await fetch("/api/users");
                 users = await r.json();
@@ -292,64 +280,63 @@
 
             function onUserSelect() {
                 const id = +userSelect.value;
-                if (!id) {
-                    activeUserId = null;
-                    activeUser.innerText = "Не выбран";
-                    renderCompanies();
+                activeUser = users.find((u) => u.id === id);
+                if (!activeUser) {
+                    companyTitle.innerText = "Выберите пользователя";
+                    companiesEl.innerHTML = "";
                     return;
                 }
-                activeUserId = id;
-                const u = users.find((x) => x.id === id);
-                activeUser.innerText = `${u.name}\n${u.email}\nID: ${u.id}`;
-                renderCompanies();
-            }
-
-            async function deleteActiveUser() {
-                if (!activeUserId) return;
-                if (!confirm("Удалить пользователя и его компании?")) return;
-                await fetch(`/api/users/${activeUserId}`, { method: "DELETE" });
-                toast("Пользователь удалён", "error");
-                activeUserId = null;
-                loadUsers();
+                activeUser.innerHTML = `${activeUser.name}`;
+                companyTitle.innerText = `Компании пользователя ${activeUser.name}`;
                 loadCompanies();
             }
 
-            /* ---------- COMPANIES ---------- */
+            async function deleteActiveUser() {
+                if (!activeUser) return;
+                if (!confirm("Удалить пользователя и его компании?")) return;
+                await fetch(`/api/users/${activeUser.id}`, {
+                    method: "DELETE",
+                });
+                toast("Пользователь удалён", "error");
+                activeUser = null;
+                loadUsers();
+                companiesEl.innerHTML = "";
+            }
+
+            /* COMPANIES */
+
             async function loadCompanies() {
-                const r = await fetch("/api/companies");
+                const r = await fetch(`/api/companies/user/${activeUser.id}`);
                 companies = await r.json();
                 renderCompanies();
             }
 
             function renderCompanies() {
-                companiesEl = companies.filter(
-                    (c) => c.user_id === activeUserId,
-                );
-                companies.innerHTML = "";
-                if (!activeUserId) {
-                    companies.innerHTML =
-                        '<li class="muted">Пользователь не выбран</li>';
+                companiesEl.innerHTML = "";
+                if (!companies.length) {
+                    companiesEl.innerHTML =
+                        '<div class="muted">Компаний пока нет</div>';
                     return;
                 }
-                if (!companiesEl.length) {
-                    companies.innerHTML = '<li class="muted">Компаний нет</li>';
-                    return;
-                }
-                companiesEl.forEach((c) => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `<span>${c.name}</span><button class="delete-btn" onclick="deleteCompany(${c.id})">✕</button>`;
-                    companies.appendChild(li);
+                companies.forEach((c) => {
+                    const div = document.createElement("div");
+                    div.className = "company-card";
+                    div.innerHTML = `
+      <strong>${c.name}</strong>
+      <button onclick="deleteCompany(${c.id})">✕</button>
+    `;
+                    companiesEl.appendChild(div);
                 });
             }
 
             async function createCompany() {
-                if (!activeUserId) return;
+                if (!activeUser) return;
                 await fetch("/api/companies", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         name: companyName.value,
-                        user_id: activeUserId,
+                        user_id: activeUser.id,
                     }),
                 });
                 companyName.value = "";
@@ -364,7 +351,6 @@
             }
 
             loadUsers();
-            loadCompanies();
         </script>
     </body>
 </html>
