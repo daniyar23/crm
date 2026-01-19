@@ -39,15 +39,16 @@
                     ),
                     var(--bg);
                 color: var(--text);
-                display: flex;
-                flex-direction: column;
+            }
+
+            .muted {
+                color: var(--muted);
             }
 
             .container {
                 max-width: 1000px;
                 margin: 40px auto;
                 padding: 24px;
-                flex: 1;
             }
 
             h1 {
@@ -62,18 +63,6 @@
                 backdrop-filter: blur(16px);
                 border-radius: 20px;
                 padding: 22px;
-                animation: fadeUp 0.4s ease;
-            }
-
-            @keyframes fadeUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(12px);
-                }
-                to {
-                    opacity: 1;
-                    transform: none;
-                }
             }
 
             .grid {
@@ -101,39 +90,15 @@
                 background: linear-gradient(135deg, #6366f1, #4f46e5);
                 border: none;
                 cursor: pointer;
-                font-weight: 500;
             }
 
             button.danger {
                 background: linear-gradient(135deg, #ef4444, #dc2626);
             }
 
-            .section-title {
-                font-size: 18px;
-                color: var(--muted);
-                margin-bottom: 12px;
-            }
-
-            /* ---------- ACTIVE USER ---------- */
-
-            .user-card {
-                background: rgba(255, 255, 255, 0.06);
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                padding: 14px;
-                line-height: 1.4;
-            }
-
-            /* ---------- COMPANIES ---------- */
-
-            .company-header {
-                font-size: 22px;
-                margin-bottom: 16px;
-            }
-
             .company-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
                 gap: 16px;
             }
 
@@ -141,32 +106,18 @@
                 position: relative;
                 background: rgba(255, 255, 255, 0.06);
                 border: 1px solid var(--border);
-                border-radius: 18px;
-                padding: 36px 16px 28px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                animation: fadeUp 0.3s ease;
-            }
-
-            .company-name {
-                font-weight: 600;
-                word-break: break-word;
+                border-radius: 16px;
+                padding: 16px;
             }
 
             .company-card button {
                 position: absolute;
-                top: 10px;
+                top: 8px;
                 right: 10px;
                 background: none;
-                border: none;
                 color: var(--danger);
                 font-size: 18px;
-                cursor: pointer;
             }
-
-            /* ---------- TOAST ---------- */
 
             #toasts {
                 position: fixed;
@@ -175,13 +126,11 @@
                 display: flex;
                 flex-direction: column;
                 gap: 12px;
-                z-index: 1000;
             }
 
             .toast {
                 padding: 14px 18px;
                 border-radius: 14px;
-                backdrop-filter: blur(12px);
             }
 
             .toast.success {
@@ -189,20 +138,6 @@
             }
             .toast.error {
                 background: rgba(239, 68, 68, 0.85);
-            }
-
-            /* ---------- FOOTER ---------- */
-
-            footer {
-                text-align: center;
-                padding: 24px;
-                font-size: 14px;
-                color: var(--muted);
-            }
-
-            footer a {
-                color: var(--muted);
-                text-decoration: none;
             }
 
             @media (max-width: 800px) {
@@ -228,11 +163,13 @@
                 </div>
 
                 <div class="card stack">
-                    <div class="section-title">Активный пользователь</div>
+                    <div class="section-title">Активный пользователь</div>
                     <select id="userSelect" onchange="onUserSelect()">
                         <option value="">— не выбран —</option>
                     </select>
-                    <div id="activeUser" class="user-card muted">Не выбран</div>
+
+                    <div id="activeUser" class="muted">Не выбран</div>
+
                     <button class="danger" onclick="deleteActiveUser()">
                         Удалить пользователя
                     </button>
@@ -240,9 +177,7 @@
             </div>
 
             <div class="card stack" style="margin-top: 32px">
-                <div id="companyTitle" class="company-header muted">
-                    Выберите пользователя
-                </div>
+                <div id="companyTitle" class="muted">Выберите пользователя</div>
 
                 <div class="stack">
                     <input id="companyName" placeholder="Название компании" />
@@ -253,20 +188,17 @@
             </div>
         </div>
 
-        <footer>
-            made by <strong>danik_dev</strong> ·
-            <a href="https://github.com/daniyar23" target="_blank"
-                >github.com/daniyar23</a
-            >
-        </footer>
-
         <script>
             let users = [];
             let companies = [];
             let activeUser = null;
 
             const companiesEl = document.getElementById("companies");
+            const activeUserEl = document.getElementById("activeUser");
+            const companyTitle = document.getElementById("companyTitle");
+            const userSelect = document.getElementById("userSelect");
 
+            /* ---------- TOAST ---------- */
             function toast(msg, type = "success") {
                 const t = document.createElement("div");
                 t.className = `toast ${type}`;
@@ -275,11 +207,12 @@
                 setTimeout(() => t.remove(), 3000);
             }
 
-            /* USERS */
+            /* ---------- USERS ---------- */
 
             async function loadUsers() {
                 const r = await fetch("/api/users");
                 users = await r.json();
+
                 userSelect.innerHTML =
                     '<option value="">— не выбран —</option>';
                 users.forEach((u) => {
@@ -288,6 +221,37 @@
                     o.textContent = `${u.name} (${u.email})`;
                     userSelect.appendChild(o);
                 });
+            }
+
+            function renderActiveUser() {
+                if (!activeUser) {
+                    activeUserEl.innerText = "Не выбран";
+                    activeUserEl.classList.add("muted");
+                    return;
+                }
+
+                activeUserEl.classList.remove("muted");
+                activeUserEl.innerHTML = `
+    <strong>ID:</strong> ${activeUser.id}<br>
+    <strong>Name:</strong> ${activeUser.name}<br>
+    <strong>Email:</strong> ${activeUser.email}
+  `;
+            }
+
+            function onUserSelect() {
+                const id = Number(userSelect.value);
+                activeUser = users.find((u) => u.id === id) || null;
+
+                renderActiveUser();
+
+                if (!activeUser) {
+                    companiesEl.innerHTML = "";
+                    companyTitle.innerText = "Выберите пользователя";
+                    return;
+                }
+
+                companyTitle.innerText = `Компании пользователя ${activeUser.name}`;
+                loadCompanies();
             }
 
             async function createUser() {
@@ -304,47 +268,23 @@
                 loadUsers();
             }
 
-            function onUserSelect() {
-                const id = +userSelect.value;
-                activeUser = users.find((u) => u.id === id);
-                if (!activeUser) {
-                    activeUserEl();
-                    companiesEl.innerHTML = "";
-                    companyTitle.innerText = "Выберите пользователя";
-                    return;
-                }
-                activeUser.innerHTML;
-                activeUserDiv();
-                companyTitle.innerText = `Компании пользователя ${activeUser.name}`;
-                loadCompanies();
-            }
-
-            function activeUserDiv() {
-                activeUserEl().innerHTML = `
-    <strong>${activeUser.name}</strong><br>
-    ${activeUser.email}<br>
-    ID: ${activeUser.id}
-  `;
-            }
-
-            function activeUserEl() {
-                return document.getElementById("activeUser");
-            }
-
             async function deleteActiveUser() {
                 if (!activeUser) return;
                 if (!confirm("Удалить пользователя и его компании?")) return;
+
                 await fetch(`/api/users/${activeUser.id}`, {
                     method: "DELETE",
                 });
-                toast("Пользователь удалён", "error");
+                toast("Пользователь удалён", "error");
+
                 activeUser = null;
+                renderActiveUser();
                 loadUsers();
                 companiesEl.innerHTML = "";
-                activeUserEl().innerText = "Не выбран";
+                companyTitle.innerText = "Выберите пользователя";
             }
 
-            /* COMPANIES */
+            /* ---------- COMPANIES ---------- */
 
             async function loadCompanies() {
                 const r = await fetch(`/api/companies/user/${activeUser.id}`);
@@ -354,16 +294,18 @@
 
             function renderCompanies() {
                 companiesEl.innerHTML = "";
+
                 if (!companies.length) {
                     companiesEl.innerHTML =
-                        '<div class="muted">Компаний пока нет</div>';
+                        '<div class="muted">Компаний пока нет</div>';
                     return;
                 }
+
                 companies.forEach((c) => {
                     const div = document.createElement("div");
                     div.className = "company-card";
                     div.innerHTML = `
-      <div class="company-name">${c.name}</div>
+      <strong>${c.name}</strong>
       <button onclick="deleteCompany(${c.id})">✕</button>
     `;
                     companiesEl.appendChild(div);
@@ -372,10 +314,7 @@
 
             async function createCompany() {
                 if (!activeUser) return;
-                if (!companyName.value.trim()) {
-                    toast("Название компании не может быть пустым", "error");
-                    return;
-                }
+
                 await fetch("/api/companies", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -384,6 +323,7 @@
                         user_id: activeUser.id,
                     }),
                 });
+
                 companyName.value = "";
                 toast("Компания добавлена");
                 loadCompanies();
