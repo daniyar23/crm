@@ -7,11 +7,16 @@ import (
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
+type KafkaConfig struct {
+	Brokers string `env:"KAFKA_BROKERS" env-required:"true"`
+	UserTopic string `env:"KAFKA_TOPIC_USER_EVENTS" env-default:"user.events"`
+}
 
 type Config struct {
 	Env        string `env:"ENV" env-default:"local"`
 	HTTPServer HTTPServer
 	DB         DBConfig
+	Kafka      KafkaConfig
 }
 
 type HTTPServer struct {

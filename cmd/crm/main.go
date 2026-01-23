@@ -40,8 +40,10 @@ func main() {
 	companyService := services.NewCompanyService(companyRepo)
 
 	// ---------- event bus ----------
-	eventBus := events.NewInMemoryBus()
-
+	eventBus := events.NewKafkaBus(
+		cfg.Kafka.Brokers,
+		cfg.Kafka.UserTopic,
+	)
 	// ---------- usecases ----------
 	userUC := usecase.NewUserUseCase(userService, eventBus)
 	companyUC := usecase.NewCompanyUseCase(companyService)
