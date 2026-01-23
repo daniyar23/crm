@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/daniyar23/crm/internal/core/config"
-	delivery "github.com/daniyar23/crm/internal/feature/feature1/delivery/http-grps"
+	delivery "github.com/daniyar23/crm/internal/feature/feature1/delivery/http"
 	"github.com/daniyar23/crm/internal/feature/feature1/events"
 	"github.com/daniyar23/crm/internal/feature/feature1/infrastructure/db"
 	"github.com/daniyar23/crm/internal/feature/feature1/services"

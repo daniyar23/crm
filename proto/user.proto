@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/daniyar23/crm/internal/feature/delivery/grpc;grpc";
+
+service UserService {
+  rpc GetUserByID (GetUserByIDRequest) returns (UserResponse);
+  rpc ListUsers (Empty) returns (UserListResponse);
+}
+
+message GetUserByIDRequest {
+  uint64 id = 1;
+}
+
+message UserResponse {
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message UserListResponse {
+  repeated UserResponse users = 1;
+}
+
+message Empty {}

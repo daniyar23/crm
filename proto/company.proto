@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package company;
+
+option go_package = "github.com/daniyar23/crm/internal/feature/delivery/grpc;grpc";
+
+service CompanyService {
+  rpc GetCompanyByID (GetCompanyByIDRequest) returns (CompanyResponse);
+  rpc ListCompaniesByUser (ListCompaniesByUserRequest) returns (CompanyListResponse);
+}
+
+message GetCompanyByIDRequest {
+  uint64 id = 1;
+}
+
+message ListCompaniesByUserRequest {
+  uint64 user_id = 1;
+}
+
+message CompanyResponse {
+  uint64 id = 1;
+  string name = 2;
+  uint64 user_id = 3;
+}
+
+message CompanyListResponse {
+  repeated CompanyResponse companies = 1;
+}
