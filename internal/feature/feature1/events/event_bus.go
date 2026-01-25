@@ -1,6 +1,9 @@
 package events
 
-type EventBus interface {
-	Publish(event any)
-	Subscribe() <-chan any
+type EventPublisher interface {
+    Publish(ctx context.Context, event Event) error
+}
+
+type EventSubscriber interface {
+    Subscribe(topic string, handler Handler) error
 }

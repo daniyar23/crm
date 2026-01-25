@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"github.com/daniyar23/crm/internal/feature/feature1/events"
 
 	"github.com/segmentio/kafka-go"
 )
